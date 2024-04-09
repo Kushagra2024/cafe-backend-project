@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/stylesheet/styles.css" />
+		<title>Register Page</title>
+	</head>
+	<body>
+		<nav>
+			<h1><a href="/">Ninja Smoothies</a></h1>
+		</nav>
+		<form>
+			<h2>Register</h2>
+			<label for="fullName">Full Name</label>
+			<input type="text" name="fullName" id="fullName" required />
+			<div class="error fullName"></div>
+
+			<label for="age">Age</label>
+			<input type="number" name="age" id="age" required />
+			<div class="error age"></div>
+
+			<label for="email">Email</label>
+			<input
+				type="text"
+				name="email"
+				id="email"
+				autocomplete="on"
+				required
+			/>
+			<div class="error email"></div>
+
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password" required />
+			<div class="error password"></div>
+
+			<button>login</button>
+		</form>
+		<footer>Copyright 2020 Ninja Smoothies</footer>
+
+		<script>
+			const form = document.querySelector("form");
+			const emailError = document.querySelector(".email");
+			const passwordError = document.querySelector(".password");
+			const fullNameError = document.querySelector(".fullName");
+			const ageError = document.querySelector(".age");
+
+			form.addEventListener("submit", async (event) => {
+				event.preventDefault();
+
+				// clearing the errors
+				fullNameError.textContent = "";
+				ageError.textContent = "";
+				emailError.textContent = "";
+				passwordError.textContent = "";
+
+				// get values
+				const fullName = form.fullName.value;
+				const age = form.age.value;
+				const email = form.email.value;
+				const password = form.password.value;
+
+				try {
+					const res = await fetch("/user/register", {
+						method: "POST",
+						body: JSON.stringify({
+							fullName,
+							age,
+							email,
+							password,
+						}),
+						headers: { "Content-Type": "application/json" },
+					});
+					const data = await res.json();
+
+					// populating errors if any
+					if (data.error) {
+						fullNameError.textContent = data.error?.fullName;
+						ageError.textContent = data.error?.age;
+						emailError.textContent = data.error?.email;
+						passwordError.textContent = data.error?.password;
+					}
+
+					if (data.userId) {
+						window.location.href = "/";
+					}
+				} catch (err) {
+					console.log(err);
+				}
+			});
+		</script>
+	</body>
+</html>

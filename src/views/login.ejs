@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/stylesheet/styles.css" />
+		<title>Document</title>
+	</head>
+	<body>
+		<nav>
+			<h1><a href="/">Ninja Smoothies</a></h1>
+		</nav>
+		<form>
+			<h2>Login</h2>
+			<label for="email">Email</label>
+			<input
+				type="text"
+				name="email"
+				id="email"
+				autocomplete="on"
+				required
+			/>
+			<div class="error email"></div>
+			<label for="password">Password</label>
+			<input type="password" name="password" id="password" required />
+			<div class="error password"></div>
+			<button>login</button>
+		</form>
+		<footer>Copyright 2020 Ninja Smoothies</footer>
+
+		<script>
+			const form = document.querySelector("form");
+			const emailError = document.querySelector(".email");
+			const passwordError = document.querySelector(".password");
+
+			form.addEventListener("submit", async (event) => {
+				event.preventDefault();
+
+				// clearing the errors
+				emailError.textContent = "";
+				passwordError.textContent = "";
+
+				// get values
+				const email = form.email.value;
+				const password = form.password.value;
+
+				try {
+					const res = await fetch("/user/login", {
+						method: "POST",
+						body: JSON.stringify({ email, password }),
+						headers: { "Content-Type": "application/json" },
+					});
+					const data = await res.json();
+
+					// populating errors if any
+					if (data.error) {
+						emailError.textContent = data.error?.email;
+						passwordError.textContent = data.error?.password;
+					}
+
+					if (data.returnToPath) {
+						window.location.href = data.returnToPath;
+					}
+				} catch (err) {
+					console.log(err);
+				}
+			});
+		</script>
+	</body>
+</html>
